@@ -1,5 +1,5 @@
 import pandas as pd
-
+import json 
 def main():
     df = pd.read_csv("data/tmdb_5000_movies.csv")
     
@@ -35,6 +35,59 @@ def main():
     for _, row in df.head(10).iterrows():
         print(f"{row['title']} (Popularity: {row['popularity']})")
     
+    documents = []
+    metadatas = []
+    
+    # Je crée un chunking simple en concaténant les champs pertinents pour chaque film
+    for row_index, row in df.iterrows():
+        # Extraction le nom des genres
+        try:
+            genres_data = json.loads(row['genres'])
+            genres_list = [genre['name'] for genre in genres_data]
+            genres_str = ", ".join(genres_list)
+        except KeyError as e:
+            print(f"Error occurred while processing genres for row {row_index}: {e}")
+            genres_str = ""
+        # Extraction des keywords
+        try :
+            keywords = json.loads(row['keywords'])
+            keywords_list = [keyword['name'] for keyword in keywords]
+            keywords_str = ", ".join(keywords_list)
+        except KeyError as e:
+            print(f"Error occurred while processing keywords for row {row_index}: {e}")
+            keywords_str = ""
+            
+        text_parts = [
+            f"Titre: {row['title']}",
+            f"Date de sortie: {row['release_date']}",
+            f"Langue originale: {row['original_language']}",
+            f"Note: {row['vote_average']}/10 ({row['vote_count']} votes)",
+            f"Durée: {row['runtime']} minutes",
+            f"Genres: {genres_str}",
+            f"Keywords: {keywords_str}",
+            f"Synopsis: {row['overview']}"
+        ]
+        text = "\n".join(text_parts)
         
+        documents.append(text)
+        metadatas.append({
+            "id": int(row_index),
+            "title": row['title'],
+            "vote_average": row['vote_average'],
+            "original_language": row['original_language'],
+            "release_date": row['release_date'],
+            "genres": genres_str,
+            "keywords": keywords_str
+        })
+    
+    # 5 premiers films
+    for i in range(5):
+        print(documents[i])
+        print("Metadata:", metadatas[i])
+        print("\n")
+        
+    ## TODO : Stocker les chunks dans un cache local pour éviter de devoir les recalculer à chaque fois
+    ## Ajouter le if cache existe déjà, charger les chunks depuis le cache au lieu de les recalculer
+    
 if __name__ == "__main__":
     main()
