@@ -1,7 +1,5 @@
 # Compte-rendu My Movie Friend
 
-Désolé pour le retard du README, le reste du projet a été rendu à l'heure. Uniquement le README a eu du retard.
-
 ## **Introduction**
 Ce document synthétise le processus de développement du projet "My Movie Friend", un système de recommandation de films basé sur une architecture RAG (Retrieval-Augmented Generation). L'objectif était de transformer une base de données tabulaire (TMDB 5000) en une base de connaissances interrogeable en langage naturel via une interface utilisant Groq et ChromaDB.
 
